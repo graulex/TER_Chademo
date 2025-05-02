@@ -1,0 +1,27 @@
+var group___g_p_i_o___definitions =
+[
+    [ "B1_GPIO_Port", "group___g_p_i_o___definitions.html#ga4926b92dcb220e465850d9616c27e171", null ],
+    [ "B1_Pin", "group___g_p_i_o___definitions.html#ga31ac298fbbc8a1d6de1dc4577a108232", null ],
+    [ "d1_EXTI_IRQn", "group___g_p_i_o___definitions.html#ga5e566e29cd9d65d8cea4b25eec9eb6f5", null ],
+    [ "d1_GPIO_Port", "group___g_p_i_o___definitions.html#ga1bf7c64e15edb412f3ba0061e3df68ee", null ],
+    [ "d1_Pin", "group___g_p_i_o___definitions.html#ga1d3960ea007a55f946d412797f772d99", null ],
+    [ "d2_EXTI_IRQn", "group___g_p_i_o___definitions.html#gaa1ae0887e9027d1cc2666b07ae066758", null ],
+    [ "d2_GPIO_Port", "group___g_p_i_o___definitions.html#ga95a57207823141d560d39705b12a83f7", null ],
+    [ "d2_Pin", "group___g_p_i_o___definitions.html#ga3bf509355b3474b21009d321a7edbf7e", null ],
+    [ "k_GPIO_Port", "group___g_p_i_o___definitions.html#gadb43eb3db1902a1de48780f33f97463a", null ],
+    [ "k_Pin", "group___g_p_i_o___definitions.html#ga4b14ee09696ccbee7018c9496e190907", null ],
+    [ "LD2_GPIO_Port", "group___g_p_i_o___definitions.html#ga5aff6ddf7fe557e53b048115ad322aa0", null ],
+    [ "LD2_Pin", "group___g_p_i_o___definitions.html#gaf17a94dd613cff35c699b06c7c6a2820", null ],
+    [ "main_relay_GPIO_Port", "group___g_p_i_o___definitions.html#ga94317f82c1eaaa7a6421c8c8ab2db8ba", null ],
+    [ "main_relay_Pin", "group___g_p_i_o___definitions.html#ga0e3befa39b73ccdfaafbfbdc994eb5eb", null ],
+    [ "SWO_GPIO_Port", "group___g_p_i_o___definitions.html#ga1540b1bd5614d42feb933c5b943263c0", null ],
+    [ "SWO_Pin", "group___g_p_i_o___definitions.html#ga92aba89301afeefb00b6dfbc6e874027", null ],
+    [ "TCK_GPIO_Port", "group___g_p_i_o___definitions.html#ga1541f23b870848a43f0274857badd175", null ],
+    [ "TCK_Pin", "group___g_p_i_o___definitions.html#ga9e21d9bed16b0275ff16a864ffb2ab6e", null ],
+    [ "TMS_GPIO_Port", "group___g_p_i_o___definitions.html#gaffce477a22cc940d3962932cb33ec422", null ],
+    [ "TMS_Pin", "group___g_p_i_o___definitions.html#gaf2c8a7a0746106e52f6f415b8921c21b", null ],
+    [ "USART_RX_GPIO_Port", "group___g_p_i_o___definitions.html#gaae451289f2eda1c04e3bf6d6120b6c0b", null ],
+    [ "USART_RX_Pin", "group___g_p_i_o___definitions.html#gac93b92f1334823df872908c845c71afc", null ],
+    [ "USART_TX_GPIO_Port", "group___g_p_i_o___definitions.html#ga79a3e098f5d738c55a12e4272b7b2f84", null ],
+    [ "USART_TX_Pin", "group___g_p_i_o___definitions.html#ga5644600bf1ed996688dd87dc3f88526c", null ]
+];

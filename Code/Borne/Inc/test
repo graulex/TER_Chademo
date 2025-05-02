@@ -1,0 +1,10 @@
+//Eteind LED
+ui_led_off(x); // x=LED_CHARGE ou LED_ERREUR
+
+
+//Allume LED
+ui_led_on(x); // x=LED_CHARGE ou LED_ERREUR
+
+//Afficher un txt
+char str[8] = "pipi";
+affiche_lcd(&hi2c1, &lcdData, str);
