@@ -1,0 +1,177 @@
+
+function StationCHAdeMO_App()
+    % Fenêtre principale
+    f = figure('Name', 'Station CHAdeMO', ...
+               'Position', [300 100 900 700], ...
+               'NumberTitle', 'off', ...
+               'MenuBar', 'none', ...
+               'Resize', 'off', ...
+               'Color', [1 1 1]);
+
+    % === Logo Université ===
+    axesLogo = axes(f, 'Units', 'pixels', 'Position', [30 620 100 60]);
+    imshow(imread('téléchargement.jpeg'), 'Parent', axesLogo); axis off;
+
+    % === Titre ===
+    uicontrol(f, 'Style', 'text', ...
+              'String', 'Interface Station CHAdeMO - Version Complète', ...
+              'FontSize', 18, ...
+              'FontWeight', 'bold', ...
+              'BackgroundColor', [1 1 1], ...
+              'Position', [250 620 450 40]);
+    % === Bouton START ===
+    uicontrol(f, 'Style', 'pushbutton', ...
+          'String', '▶ START', ...
+          'FontSize', 14, ...
+          'Position', [400 120 100 40], ...
+          'Callback', @(src, event) envoyerStartUART());
+    % === Bouton STOP ===
+    uicontrol(f, 'Style', 'pushbutton', ...
+          'String', '▶ STOP', ...
+          'FontSize', 14, ...
+          'Position', [520 120 100 40], ...
+          'Callback', @(src, event) envoyerStopUART());
+    btnQuitter = uicontrol('Style', 'pushbutton', ...
+                       'String', 'Quitter', ...
+                       'Position', [10, 10, 100, 30], ...
+                       'Callback', @(src, event) fermetureApp());
+
+    % === Zone image batterie dynamique ===
+    axBattery = axes(f, 'Units', 'pixels', 'Position', [350 300 200 250]);
+    imgBattery = imshow(imread('battery_0.png'), 'Parent', axBattery);
+    axis off;
+
+    % === LED état de charge ===
+    led = rectangle('Position', [800 620 20 20], ...
+                    'Curvature', [1 1], ...
+                    'FaceColor', [0.5 0.5 0.5], ...
+                    'EdgeColor', 'black');
+    text(760, 622, 'État :', 'FontSize', 10);
+
+    % === Texte état général ===
+    txtEtat = uicontrol(f, 'Style', 'text', ...
+                        'String', 'En attente...', ...
+                        'FontSize', 13, ...
+                        'ForegroundColor', [0 0.5 0], ...
+                        'BackgroundColor', [1 1 1], ...
+                        'Position', [300 230 300 30]);
+
+    % === Zone d'affichage des données ===
+    txtDonnees = uicontrol(f, 'Style', 'text', ...
+                           'String', 'Tension: -- V | Courant: -- A | Batterie: -- %', ...
+                           'FontSize', 12, ...
+                           'Position', [220 200 500 30], ...
+                           'BackgroundColor', [1 1 1]);
+
+    % === Barre de progression SOC ===
+    progressBar = uicontrol(f, 'Style', 'text', ...
+                            'Position', [250 170 400 20], ...
+                            'BackgroundColor', [0.9 0.9 0.9], ...
+                            'HorizontalAlignment', 'left');
+    fillBar = uicontrol(f, 'Style', 'text', ...
+                        'Position', [250 170 0 20], ...
+                        'BackgroundColor', [0.2 0.7 0.2]);
+
+    % === Timer UART ===
+    t = timer('ExecutionMode', 'fixedRate', ...
+              'Period', 2.0, ...
+              'TimerFcn', @(~,~) lireDonneesUART(txtDonnees, txtEtat, led, imgBattery, fillBar));
+    start(t);
+
+    f.CloseRequestFcn = @(src, event) fermetureApp();
+end
+
+function lireDonneesUART(txtDonnees, txtEtat, led, imgBattery, fillBar)
+    try
+        port = 'COM3'; baud = 115200;
+        s = serialport(port, baud, 'Timeout', 1);
+        data = readline(s);
+        clear s;
+
+        if contains(data, 'EV_READY')
+            set(txtEtat, 'String', '✅ EV prêt. Envoi de PARAM_REQUEST...');
+            pause(0.5);
+            envoyerParamRequestUART();
+
+        elseif contains(data, 'PARAMETER')
+            tokens = regexp(data, 'T=(\d+\.?\d*);I=(\d+\.?\d*);SOC=(\d+)', 'tokens');
+            if ~isempty(tokens)
+                vals = tokens{1};
+                soc = str2double(vals{3});
+                msg = sprintf('Tension: %s V | Courant: %s A | Batterie: %s %%', vals{1}, vals{2}, vals{3});
+                set(txtDonnees, 'String', msg);
+                set(txtEtat, 'String', '🔧 Paramètres batterie reçus.');
+
+                % Mettre à jour l'image batterie
+                if soc < 25
+                    img = 'battery_0.png';
+                elseif soc < 50
+                    img = 'battery_25.png';
+                elseif soc < 75
+                    img = 'battery_50.png';
+                elseif soc < 100
+                    img = 'battery_75.png';
+                else
+                    img = 'battery_100.png';
+                end
+                set(imgBattery, 'CData', imread(img));
+
+                % Mettre à jour la barre de progression
+                socWidth = round((soc/100)*400); % largeur max = 400 px
+                set(fillBar, 'Position', [250 170 socWidth 20]);
+            end
+
+        elseif contains(data, 'CHARGE_OK')
+            set(txtEtat, 'String', '✅ Charge autorisée.');
+            set(led, 'FaceColor', [0 1 0]);
+
+        elseif contains(data, 'CHARGING')
+            set(txtEtat, 'String', '⚡ Charge en cours...');
+
+        elseif contains(data, 'EOC')
+            set(txtEtat, 'String', '🔋 Fin de charge atteinte.');
+            set(led, 'FaceColor', [0.5 0.5 0.5]);
+        end
+
+    catch
+        % silence
+    end
+end
+
+function envoyerParamRequestUART()
+    try
+        s = serialport('COM3', 115200);
+        writeline(s, "PARAM_REQUEST");
+        pause(0.1);
+        clear s;
+    catch
+        disp('Erreur envoi PARAM_REQUEST.');
+    end
+end
+
+function fermerApp(~, ~, f, t)
+    try
+        stop(t);
+        delete(t);
+    catch
+        % timer peut être déjà supprimé
+    end
+    delete(f);
+    disp('App fermée proprement.');
+end
+
+function fermetureApp()
+    % Stoppe le timer s'il existe
+    if exist('t', 'var') && isvalid(t)
+        stop(t);
+        delete(t);
+    end
+
+    % Ferme la connexion série si elle existe
+    if exist('s', 'var') && isvalid(s)
+        clear s
+    end
+
+    % Ferme la figure si c’est une app graphique
+    close all force;
+end
